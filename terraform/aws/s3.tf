@@ -66,8 +66,29 @@ resource "aws_s3_bucket" "financials" {
 
 
 resource "aws_s3_bucket" "financials_log_bucket" {
+	# checkov:skip=CKV_AWS_144: No need to replicate this across regions.
+	# checkov:skip=CKV_AWS_145: No need to encrypt this bucket.
   bucket = "financials-log-bucket"
 }
+
+resource "aws_s3_bucket_public_access_block" "financials_log_bucket" {
+  bucket = aws_s3_bucket.financials_log_bucket.id
+
+  block_public_acls   = true
+  block_public_policy = true
+  restrict_public_buckets = true
+}
+
+
+resource "aws_s3_bucket_versioning" "financials_log_bucket" {
+  bucket = aws_s3_bucket.financials_log_bucket.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+
 
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "financials_log_bucket" {
